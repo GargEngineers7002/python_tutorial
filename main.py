@@ -7,42 +7,53 @@ async def another_task():
     print("ending another task")
 
 
+async def crashing_task():
+    print("starting crashing task")
+    await asyncio.sleep(0.1)
+    raise ValueError("Boom!")
+
+
+async def worker_task(tg):
+    print("starting worker task")
+    try:
+        await asyncio.sleep(10)
+        print("ending worker task")
+    except asyncio.CancelledError:
+        # this throws an error because TaskGroup <TaskGroup entered> is shutting down
+        tg.create_task(another_task())
+
+
 async def main():
     print("hello world")
 
-    # this throws a runtime warning as another_task() returns a coroutine
-    # and it does not execute a single line of code
-    # you'd have to await it to execute the code
-    # or use asyncio.create_task() to create a task
-    task = another_task()
+    tg = asyncio.TaskGroup()
 
-    # This throws a runtime error as it is responsible for starting an event loop
-    # asyncio.run(another_task())
+    # Error type 1:
+    # this throws an runtime error
+    # because TaskGroup <TaskGroup> has not been entered
+    # tg.create_task(another_task())
 
-    # before running the entire task the asyncio.run() destroys the event loop
-    # at the completion of the main function
-    # asyncio.create_task(another_task())
-
-    task = asyncio.create_task(another_task())
-
-    print("some task in main")
-    await asyncio.sleep(0.5)
-    print("some task ended in main")
-
-    # this is important as it keeps the event loop running
-    await task
-    print()
-
-    # OR one better way to do this is
-
-    async with asyncio.TaskGroup() as tg:
+    async with tg:
         tg.create_task(another_task())
 
-        print("some task in main")
+        print("starting main task")
         await asyncio.sleep(0.5)
-        print("some task ended in main")
+        print("ending main task")
 
-    # No need for await task
+        # Error type 3:
+        # this combo also throws errors because
+        # after the crashing_task() crashes and raises error,
+        # the TaskGroup <TaskGroup tasks=1 errors=1 cancelling> is shutting down
+        # TaskGroup cancels worker_task.
+        # and rejects the create_task() call from the worker_task()
+        # TaskGroup handles the closing of the coroutines as well.
+        # tg.create_task(worker_task(tg))
+        # tg.create_task(crashing_task())
+
+    # Error type 2:
+    # this throws an runtime error
+    # because TaskGroup <TaskGroup entered> is finished
+    # tg.create_task(another_task())
 
 
 asyncio.run(main())
