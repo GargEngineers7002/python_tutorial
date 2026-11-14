@@ -1,49 +1,26 @@
-# This comiles.
-# This won't raise an error until executed.
-# This shows that python compiler cannot be depended upon
-def bad_reference():
-    # This function contains a bad reference to a variable that is not defined
-    print(
-        undefined_variable
-    )  # This will raise a NameError because undefined_variable is not defined
-    undefined_variable = (
-        "This variable is now defined"  # Defining the variable after its usage
-    )
+from urllib.parse import parse_qs
+
+my_vals = parse_qs("red=5&blue=0&green=", keep_blank_values=True)
+
+print(repr(my_vals))
+
+# So this is very complicated and
+# takes a lot of time to read and understand.
+red = int(my_vals.get("red", [""])[0] or 0)
+print(red)
+
+# Better
+green_str = my_vals.get("green", [""])[0]
+green = int(green_str) if green_str else 0
+print(green)
 
 
-# bad_reference()  # Calling the function to demonstrate the bad reference
+# Best
+def get_first_int(values, key, default=0):
+    found = values.get(key, [""])
+    if found[0]:
+        return int(found[0])
+    return default
 
 
-def sommetimes_ok(x):
-    if x:
-        my_var = 123
-    print(my_var)
-
-
-# This will print 123 because my_var is defined in the if block
-# sommetimes_ok(True)
-
-# This will raise a UnboundLocalError because my_var is not
-# sommetimes_ok(False)
-
-
-# This also compiles but will raise an error when executed
-def bad_math():
-    return 1 / 0
-
-
-# bad_math()
-
-
-# This will also compile but will raise an error when executed
-# Undefined function call
-# hi_method()
-
-
-def add_method(a, b):
-    return a + b
-
-
-# This will also compile but will raise an error when executed
-# TypeError
-add_method(1)
+print(get_first_int(my_vals, "oppa"))
