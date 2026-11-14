@@ -1,0 +1,7 @@
+[tool.ruff]
+line-length = 79 # Match strict PEP 8 (default is 88)
+
+[tool.ruff.lint]
+# E/W = pycodestyle, F = Pyflakes, I = isort (imports), N = pep8-naming, UP = pyupgrade
+select = ["E", "W", "F", "I", "N", "UP", "SIM"]
+ignore = ["E501"] # Stop flagging long comments/strings that the formatter can't wrap
