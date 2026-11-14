@@ -1,26 +1,47 @@
-from urllib.parse import parse_qs
+# This is unpacking in python.
+# Nothing  really complicated here.
+favorite_snacks = {
+    "salty": ("pretzels", 100),
+    "sweet": ("cookies", 180),
+    "veggie": ("carrots", 20),
+}
+((type1, (name1, cals1)), (type2, (name2, cals2)), (type3, (name3, cals3))) = (
+    favorite_snacks.items()
+)
+print(f"Favorite {type1} is {name1} with {cals1} calories")
+print(f"Favorite {type2} is {name2} with {cals2} calories")
+print(f"Favorite {type3} is {name3} with {cals3} calories")
 
-my_vals = parse_qs("red=5&blue=0&green=", keep_blank_values=True)
-
-print(repr(my_vals))
-
-# So this is very complicated and
-# takes a lot of time to read and understand.
-red = int(my_vals.get("red", [""])[0] or 0)
-print(red)
-
-# Better
-green_str = my_vals.get("green", [""])[0]
-green = int(green_str) if green_str else 0
-print(green)
-
-
-# Best
-def get_first_int(values, key, default=0):
-    found = values.get(key, [""])
-    if found[0]:
-        return int(found[0])
-    return default
+print()
 
 
-print(get_first_int(my_vals, "oppa"))
+def bubble_sort(a):
+    for j in range(len(a)):
+        for i in range(1, len(a) - j):
+            # Interesting way to swap.
+            # The right side of assignment becomes
+            # a temporary tuple till assignment
+            # completes.
+            a[i], a[i - 1] = a[i - 1], a[i]
+
+
+names = ["pretzels", "carrots", "arugula", "bacon"]
+bubble_sort(names)
+print(names)
+
+print()
+
+snacks = [("bacon", 350), ("donut", 240), ("muffin", 190)]
+# Normal way:
+print("Normal way")
+for i in range(len(snacks)):
+    item = snacks[i]
+    name = item[0]
+    calories = item[1]
+    print(f"#{i + 1}: {name} has {calories} calories")
+
+
+# Pythonic way:
+print("Pythonic way")
+for i, (name, calories) in enumerate(snacks):
+    print(f"#{i + 1}: {name} has {calories} calories")
