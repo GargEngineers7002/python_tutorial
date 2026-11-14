@@ -1,65 +1,49 @@
-# ruff check --fix has not been run here till now becuase it just removes a lot of
-# lines which show some of the examples of the pep8 rules.
-# you can run it and check how it works.
-
-# !. IMPORTS: Top of the file, Grouped ( Stdlib -> 3rd Party -> Local), alphabetical
-import os
-import sys
-
-import requests
-
-from billing_app import models  # Explicit absolute import
-from . import utils  # Exlicit relative import(using dot notation)
-
-# 2. NAMING: ALL_CAPS for module-level constants
-MAX_RETRIES = 3
-DEFAULT_CURRENCY = "USD"
+# This comiles.
+# This won't raise an error until executed.
+# This shows that python compiler cannot be depended upon
+def bad_reference():
+    # This function contains a bad reference to a variable that is not defined
+    print(
+        undefined_variable
+    )  # This will raise a NameError because undefined_variable is not defined
+    undefined_variable = (
+        "This variable is now defined"  # Defining the variable after its usage
+    )
 
 
-# 3. NAMING: CapitalizedWords for classes and exceptions
-class PaymentProcessorError(Exception):
-    pass
+# bad_reference()  # Calling the function to demonstrate the bad reference
 
 
-class PaymentProcessor:
-    # 4. NAMING: 'self' for instance methods, lowercase_underscore for args/vars
-    def __init__(self, api_key: str, pending_items: list) -> None:
-        self.api_key = api_key  # Public attribute
-        self._retry_count = 0  # _leading_underscore:Protected (internal use)
-        self.__secret_token = (
-            "xyz_987"  # __double_leading: Private (name-mangled)
-        )
-        self.pending_items = pending_items
+def sommetimes_ok(x):
+    if x:
+        my_var = 123
+    print(my_var)
 
-    # 5. NAMING: 'cls' as first parameter for @classmethod
-    @classmethod
-    def from_env(cls, pending_items: list):
-        return cls(os.getenv("API_KEY", ""), pending_items)
 
-    # 6. NAMING: lowercase_underscore for methods and functions
-    def process_batch(self, discount=None):
-        # 7. EXPRESSIONS: Implicit falsiness for empty sequences (no len(x) == 0)
-        if not self.pending_items:
-            return 0.0
+# This will print 123 because my_var is defined in the if block
+# sommetimes_ok(True)
 
-        # 8. EXPRESSIONS: Inline negation ('is not') & implicit truthiness ('if self.pending_items')
-        if discount is not None and self.pending_items:
-            # 9. EXPRESSIONS: Parantheses for multiline expressions (no backslashes \)
-            # Plus 4 extra spaces on continuation lines!
-            total_amount = (
-                sum(item.price for item in self.pending_items)
-                - discount.amount
-                + discount.tax_adjustment
-            )
-        else:
-            total_amount = sum(item.price for item in self.pending_items)
+# This will raise a UnboundLocalError because my_var is not
+# sommetimes_ok(False)
 
-        # 10. EXPRESSIONS: Multi-line loops and try/except (never single-line)
-        for item in self.pending_items:
-            try:
-                utils.charge_card(self.__secret_token, item, total_amount)
-            except requests.RequestException as exc:
-                self._retry_count += 1
-                raise PaymentProcessorError("Charge failed") from exc
 
-        return total_amount
+# This also compiles but will raise an error when executed
+def bad_math():
+    return 1 / 0
+
+
+# bad_math()
+
+
+# This will also compile but will raise an error when executed
+# Undefined function call
+# hi_method()
+
+
+def add_method(a, b):
+    return a + b
+
+
+# This will also compile but will raise an error when executed
+# TypeError
+add_method(1)
